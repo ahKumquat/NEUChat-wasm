@@ -12,7 +12,13 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false,
+      "all": true,
+      "http": {
+        "scope": ["http://localhost:1420/*"]
+      },
+      "fs": {
+        "scope": ["$DOCUMENT/**"]
+      },
       "shell": {
         "all": false,
         "open": true

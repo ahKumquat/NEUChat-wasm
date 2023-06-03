@@ -1,19 +1,21 @@
 <script setup lang="ts">
+
 import {reactive} from "vue";
+import {register} from "../common/Api";
 import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
 import {minimizeWindow, closeWindow} from "../common/WindowEvent";
 
 
-import {login, register} from "../common/Api";
-
-//The form
-const user = reactive({
+const newUser = reactive({
   account: "",
+  username: "",
   password: ""
 })
 
-const requestLogin = async () => {
-  const token = (await login(user)).data;
+
+
+const requestRegister = async () => {
+  const token = (await register(newUser)).data;
   if (!token) {
     console.log("The token is null!");
     return;
@@ -29,6 +31,7 @@ const requestLogin = async () => {
     center: true,
     minHeight: 600,
     minWidth: 800,
+    decorations: false,
   });
 
   //Creating successfully
@@ -36,21 +39,8 @@ const requestLogin = async () => {
     appWindow?.close();
   });
 
-};
-
-const requestRegister = async () => {
-  const webview = new WebviewWindow("register", {
-    url: "#/register",
-    center: true,
-    minHeight: 600,
-    minWidth: 800,
-  });
-
-  //Creating successfully
-  await webview.once("tauri://created", function () {
-    appWindow?.close();
-  });
 }
+
 </script>
 
 <template>
@@ -69,13 +59,16 @@ const requestRegister = async () => {
     <div class = "input-box">
       <div>
         <span>Account</span>
-        <input v-model = "user.account" type = "text" placeholder="Your Account">
+        <input v-model = "newUser.account" type = "text" placeholder="Your Account">
+      </div>
+      <div>
+        <span>Username</span>
+        <input v-model = "newUser.username" type = "text" placeholder="Your UserName">
       </div>
       <div>
         <span>Password</span>
-        <input v-model = "user.password" type = "password" placeholder="Your Password">
+        <input v-model = "newUser.password" type = "password" placeholder="Your Password">
       </div>
-      <button @click = "requestLogin()" class="login-btn">Login</button>
       <button @click = "requestRegister()" class="register-btn">Register</button>
     </div>
   </div>
@@ -161,7 +154,7 @@ const requestRegister = async () => {
   }
 }
 
-.login-btn{
+.register-btn{
   width: 100%;
   height:40px;
   background: #0f0f0f;
@@ -171,18 +164,9 @@ const requestRegister = async () => {
   margin-top: 20px;
   border-radius: 4px;
   font-size: 15px;
- }
-
-.register-btn{
-  width: 100%;
-  height:40px;
-  color: #0f0f0f;
-  background: #fb7373;
-  outline: none;
-  border: none;
-  margin-top: 20px;
-  border-radius: 4px;
-  font-size: 15px;
 }
+
+
+
 
 </style>

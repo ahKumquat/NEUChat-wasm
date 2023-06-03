@@ -1,5 +1,13 @@
 import request from './Request'
 
+export const register = (params: Record<string, any>) => {
+    return request.request<string>( {
+        url:'/register',
+        method: 'POST',
+        data: params,
+    })
+}
+
 export const login = (params: Record<string, any>) => {
     return request.request<string>({
         url:'/login',
