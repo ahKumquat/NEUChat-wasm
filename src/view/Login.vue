@@ -39,8 +39,8 @@ const requestLogin = async () => {
 };
 
 const requestRegister = async () => {
-  const webview = new WebviewWindow("register", {
-    url: "#/register",
+  const webview = new WebviewWindow("registration", {
+    url: "#/registration",
     center: true,
     minHeight: 600,
     minWidth: 800,

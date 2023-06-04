@@ -7,37 +7,34 @@ import {minimizeWindow, closeWindow} from "../common/WindowEvent";
 
 
 const newUser = reactive({
+  id:"",
   account: "",
   username: "",
   password: ""
 })
 
 
-
 const requestRegister = async () => {
-  const token = (await register(newUser)).data;
-  if (!token) {
+  if (!await register(newUser)) {
     console.log("The token is null!");
     return;
+  } else {
+
+    appWindow?.hide();
+
+    //Create a new window for chat view
+    const webview = new WebviewWindow("chat", {
+      url: "#/chat",
+      center: true,
+      minHeight: 600,
+      minWidth: 800,
+    });
+
+    // //Creating successfully
+    await webview.once("tauri://created", function () {
+      appWindow?.close();
+    });
   }
-
-  //Save token to local cache
-  localStorage.setItem("token", token);
-  appWindow?.hide();
-
-  //Create a new window for chat view
-  const webview = new WebviewWindow("chat", {
-    url: "#/chat",
-    center: true,
-    minHeight: 600,
-    minWidth: 800,
-    decorations: false,
-  });
-
-  //Creating successfully
-  await webview.once("tauri://created", function () {
-    appWindow?.close();
-  });
 
 }
 

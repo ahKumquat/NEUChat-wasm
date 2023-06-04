@@ -1,5 +1,6 @@
 import request from './Request'
 
+
 export const register = (params: Record<string, any>) => {
     return request.request<string>( {
         url:'/register',
