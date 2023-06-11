@@ -1,35 +1,31 @@
 enum MsgType {
     DOGE = "doge",
     MESSAGE = "message",
-    VIDEO_REQUEST = "vRequest",
-    VIDEO_ANSWER = "vAnswer",
+    VOICE_ANSWER = "voAnswer",
     NEW_ICE_CANDIDATE = "nIceCan",
     READY = "ready",
     ACCEPT_STATE = "acceptState",
-    VIDEO_OVER = "vOver"
+    VOICE_OFFER = "voOffer"
 }
 
 enum EventType {
    CHAT_A = "chatA",
    CHAT_B = "chatB",
+   VOICE_CHAT = "voiceChat",
+   VOICE_CHAT_READY = "voiceChatReady",
    VIDEO_CHAT = "videoChat",
-   VIDEO_CHAT_READY = "videoChatReady",
-   VIDEO_SELECTION = "videoSelection"
 }
 
 class LocalFn {
-    public static SAVE_CHAT_HISTORY = "saveChatHistory";
+    public static SAVE_CHAT_HISTORY = "save_chat_history";
 }
 
 class PagePath {
     public static CHAT_VIEW = "#/chat";
-    public static VIDEO_SELECTION_VIEW = "#/videoSelection";
-    public static VIDEO_CHAT_VIEW = "#/videoChat";
 }
 
 class NEUChat {
     public static DIR = "NEUChat files";
-
     public static SUFFIX = ".txt";
 }
 

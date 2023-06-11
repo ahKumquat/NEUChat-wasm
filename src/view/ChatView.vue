@@ -1,141 +1,82 @@
-<script setup lang = "ts">
-import {onMounted} from "vue";
-import {minimizeWindow, hideWindow} from "../common/WindowEvent";
-import {
-    selectUser,
-    videoCall,
-    sendMsg,
-    init,
-    user,
-    msgObj,
-    userIdx,
-    chatHistory,
-    userList,
-} from "../script/ChatController";
-
-onMounted(() => {
-  init();
-});
-
-</script>
-
 <template>
-  <div data-tauri-drag-region class="titleBar">
-    <div @click = "minimizeWindow()" class="titleBarBtn">
-      <i class="iconfont iconMinus"></i>
-    </div>
-  </div>
-
-  <div @click="hideWindow()" class="titleBar-btn closeBtn">
-    <i class="iconfont iconClose"></i>
-  </div>
-
   <div class="main">
-
     <div class = "sideBar">
-     <img class="userAvatar" :src="user?.avatar" alt=""/>
+      <img class="userAvatar" :src="user?.avatar" alt=""/>
       <div class="iconBox">
         <i class="iconfont iconChat"></i>
       </div>
+      <button class = "gameRoom" @click = "openGame()"/>
     </div>
 
     <div class = "userList">
-
       <div class = "searchBox">
-        <input type = "text" placeholder="Search">
+        <input type = "text" placeholder="Search" @click = "openAuto()" @blur = "closeAuto()">
+        <div class="result" :hidden="true" id="searchinput">
+          <div v-for = "u in userList" >
+            <span> {{u}} </span>
+          </div>
+        </div>
       </div>
 
-      <div class = "list">
+
+      <div class = "list" id = "items">
         <div
-            @click="selectUser(idx)"
-            class = "item"
-            :class="userIdx == idx ? 'active': ''"
-            v-for="(item, idx) in userList"
-            :key="idx"
-          >
-            <img class = "avatar" :src="item.avatar" alt=""/>
-            <div>
-              <h5>{{item.userName}}}</h5>
-              <span class = "time">1 min ago</span>
-            </div>
+            @click = "selectUser(idx)"
+            v-for = "(item, idx) in userList"
+            class="result2"
+            :key = "idx"
+            :class="userIdx == idx ? 'active':''"
+        >
+          <div class="item">
+            <h5>{{item}}</h5>
+          </div>
             <div>
               <div v-show="item.unread" class = "mark"></div>
             </div>
         </div>
       </div>
-      </div>
+    </div>
 
     <div class="content">
-
       <div class="title">
         <span>{{
-            userIdx != -1 ? userList[userIdx].userName:""
-          }}</span>
+            userIdx != -1 ? userList[userIdx]:""
+          }}
+        </span>
       </div>
 
-      <div ref="record" class="record">
+      <div ref="record" class="record" :style = " userIdx == -1 ? 'visibility: hidden' : ''">
         <div
             :class="item.isSend == 1? 'self' : 'other'"
             v-for="(item,idx) in chatHistory"
             :key = "idx">
-            <div v-if="item.isSend == 1" class="bubbleBox">
-              {{ item.msg }}
-            </div>
+          <div v-if="item.isSend == 1" class="bubbleBox">
+            {{item.msg}}
+          </div>
           <img
               class="avatar"
               :src="item.isSend == 1? user.avatar:item.senderAvatar"
               alt=""
           />
           <div v-if="item.isSend == 2" class="bubbleBox">
-            {{ item.msg }}
+            {{item.msg}}
           </div>
         </div>
       </div>
 
-      <div class = "input">
-          <div class="icon">
-            <i @click = "videoCall(true)" class="iconfont icon-videoCall"></i>
-          </div>
-          <textarea v-model = "msgObj.msg" cols="30" rows="4"></textarea>
-          <button @click="sendMsg()" class = "sendBtn">Send</button>
-      </div>
+      <div class = "input" :style = " userIdx == -1 ? 'visibility: hidden' : ''">
+        <div class="icon">
+          <button @click="openGame()" class="gameButton"/>
+        </div>
+        <textarea v-model = "msgObj.msg" cols="30" rows="4"></textarea>
+        <button @click="sendMsg()" class = "sendBtn">Send</button>
       </div>
     </div>
+  </div>
 </template>
 
 <style lang="less" scoped>
 
-.titleBar {
-  height: 28px;
-  user-select: none;
-  display: flex;
-  justify-content: flex-end;
-  position: fixed;
-  top: 0;
-  right: 0;
-  color: #494949;
-}
-
-.titleBar-button {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 44px;
-  height: 26px;
-  cursor: pointer;
-  i {
-    font-size: 16px;
-  }
-}
-
-.titleBar-button:hover {
-  background: #e2e2e2;
-}
-
-.close-btn:hover {
-  background: #fb7373;
-  color: #ffffff;
-}
 
 .main {
   height: 100%;
@@ -190,6 +131,25 @@ onMounted(() => {
     background: #ffffff;
     color: #0f0f0f;
     margin-top: 10px;
+  }
+  .result {
+    color: #0f0f0f;
+    background: #665dfe;
+    border-radius: 7px;
+    border: 1px solid #e5e9f2;
+    position: fixed;
+    top: 50px;
+    width: calc(100% - 550px);
+    height: 100px;
+    overflow: auto;
+    z-index: 1;
+    div {
+      display: flex;
+      padding: 0 20px;
+      span {
+        margin-top: 10px;
+      }
+    }
   }
 }
 
@@ -254,6 +214,7 @@ onMounted(() => {
     border-bottom: 1px solid #e5e9f2;
     padding: 0 20px;
     font-size: 20px;
+    color: #0f0f0f;
   }
   .record {
     height: 100%;
@@ -293,7 +254,8 @@ onMounted(() => {
       .bubbleBox {
         border-bottom-right-radius: 4px;
         margin-left: 10px;
-        background: #ffffff;
+        color: #f6f6f6;
+        background: #49556c;
       }
     }
   }
@@ -305,19 +267,17 @@ onMounted(() => {
     position: relative;
     line-height: 0;
     .icon {
-      width: 100%;
+      width: 30px;
+      height: 40px;
       position: absolute;
       cursor: pointer;
-      color: #0f0f0f;
-      top: 20px;
-      padding: 0 10px;
+      right: 10px;
       display: flex;
-      align-items: center;
       justify-content: flex-end;
       box-sizing: border-box;
-      .iconfont {
-        font-size: 18px;
-        padding: 0 10px;
+      .gameButton{
+        background: #665dfe;
+        margin-left: 10px;
       }
     }
     .sendBtn {
@@ -337,9 +297,12 @@ onMounted(() => {
     }
   }
 }
-
-
-
+.gameRoom{
+  background: #fb7373;
+  margin-top: 10px;
+  width: 40px;
+  height: 40px;
+}
 .avatar {
   width: 48px;
   height: 48px;
@@ -364,6 +327,58 @@ textarea {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 7px;
-  background: #665dfe;
+  background: #494949;
+}
+
+.result2 {
+  color: #0f0f0f;
+  border-radius: 7px;
 }
 </style>
+
+<script setup lang = "ts">
+
+import {onMounted} from "vue";
+import {
+  selectUser,
+  sendMsg,
+  init,
+  user,
+  msgObj,
+  userIdx,
+  chatHistory,
+  userList, videoCall,
+} from "../script/ChatController";
+import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
+
+onMounted(() => {
+  init();
+});
+
+const openAuto = () => {
+  document.getElementById("searchinput")!.hidden = false;
+  document.getElementById("items")!.style.overflow = "hidden";
+}
+
+const closeAuto = () => {
+  document.getElementById("searchinput")!.hidden = true;
+  document.getElementById("items")!.style.overflow = "auto";
+}
+
+const openGame = async () => {
+ new WebviewWindow("game", {
+    url: "#/game",
+    center: true,
+    minHeight: 600,
+    minWidth: 800,
+  });
+
+}
+
+const requestSearch = async() => {
+
+}
+
+
+</script>
+

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import {reactive} from "vue";
 import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
-import {minimizeWindow, closeWindow} from "../common/WindowEvent";
 
-
-import {login, register} from "../common/Api";
+import {login} from "../common/Api";
+import {PagePath} from "../common/Constants";
 
 //The form
 const user = reactive({
   account: "",
+  username:"",
   password: ""
 })
 
@@ -25,7 +25,7 @@ const requestLogin = async () => {
 
   //Create a new window for chat view
   const webview = new WebviewWindow("chat", {
-    url: "#/chat",
+    url: PagePath.CHAT_VIEW,
     center: true,
     minHeight: 600,
     minWidth: 800,
@@ -54,14 +54,6 @@ const requestRegister = async () => {
 </script>
 
 <template>
-  <div data-tauri-drag-region class = "titleBar">
-    <div @click = "minimizeWindow()" class="titleBar-button">
-      <i class="iconfont icon-minus"></i>
-    </div>
-    <div @click="closeWindow()" class = "titleBar-button close-btn">
-      <i class="iconfont icon-close"></i>
-    </div>
-  </div>
   <div class="main">
     <div class = "back">
       <span>NEUChat</span>

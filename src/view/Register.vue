@@ -3,52 +3,44 @@
 import {reactive} from "vue";
 import {register} from "../common/Api";
 import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
-import {minimizeWindow, closeWindow} from "../common/WindowEvent";
 
 
 const newUser = reactive({
-  id:"",
   account: "",
   username: "",
-  password: ""
+  password: "",
 })
 
 
 const requestRegister = async () => {
-  if (!await register(newUser)) {
+  const token = (await register(newUser)).data;
+  if (!token) {
     console.log("The token is null!");
     return;
-  } else {
-
-    appWindow?.hide();
-
-    //Create a new window for chat view
-    const webview = new WebviewWindow("chat", {
-      url: "#/chat",
-      center: true,
-      minHeight: 600,
-      minWidth: 800,
-    });
-
-    // //Creating successfully
-    await webview.once("tauri://created", function () {
-      appWindow?.close();
-    });
   }
+
+  //Save token to local cache
+  localStorage.setItem("token", token);
+  appWindow?.hide();
+
+  //Create a new window for chat view
+  const webview = new WebviewWindow("chat", {
+    url: "#/chat",
+    center: true,
+    minHeight: 600,
+    minWidth: 800,
+  });
+
+  //Creating successfully
+  await webview.once("tauri://created", function () {
+    appWindow?.close();
+  });
 
 }
 
 </script>
 
 <template>
-  <div data-tauri-drag-region class = "titleBar">
-    <div @click = "minimizeWindow()" class="titleBar-button">
-      <i class="iconfont icon-minus"></i>
-    </div>
-    <div @click="closeWindow()" class = "titleBar-button close-btn">
-      <i class="iconfont icon-close"></i>
-    </div>
-  </div>
   <div class="main">
     <div class = "back">
       <span>NEUChat</span>
